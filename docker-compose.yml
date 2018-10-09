@@ -1,0 +1,31 @@
+version: "3"
+services:
+  influxdb:
+    image: influxdb:latest
+    restart: always
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+
+  kapacitor:
+    image: kapacitor:latest
+    depends_on:
+      - influxdb
+    environment:
+      KAPACITOR_LOGGING_LEVEL: DEBUG
+      KAPACITOR_HOSTNAME: kapacitor
+      KAPACITOR_INFLUXDB_0_URLS_0: http://influxdb:8086
+    volumes:
+      - ./data/kapacitor:/var/lib/kapacitor
+      - ./ticks:/data
+
+  chronograf:
+    image: chronograf:latest
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+      KAPACITOR_URL: http://kapacitor:9092
+    volumes:
+      - ./chronograf:/var/lib/chronograf
+    ports:
+      - "8888:8888"

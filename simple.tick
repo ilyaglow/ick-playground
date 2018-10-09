@@ -1,0 +1,6 @@
+stream
+     |from()
+         .measurement('dns')
+     |changeDetect('value')
+     |alert()
+         .log('/tmp/alerts.log')
